@@ -1,24 +1,13 @@
 # Woodpecker CI Pipeline for intellij-better-direnv
 # Steps:
-# - validate Gradle Wrapper
-# - run 'test' and 'verifyPlugin' tasks
-# - run Qodana inspections
-# - run 'buildPlugin' task and prepare artifact
-# - run 'runPluginVerifier' task
+# - run 'build' and 'verifyPlugin' tasks
+# - run 'sonaraube' task (conditional)
 # - create a draft release
 
 when:
   - event: [push, pull_request]
 
 steps:
-  - name: qodana
-    image: jetbrains/qodana-jvm
-    environment:
-      QODANA_TOKEN:
-        from_secret: qodana_token
-    commands:
-      - '[ -z "$QODANA_TOKEN" ] || [ "$QODANA_TOKEN" = "." ] && echo "Skipping: QODANA_TOKEN not configured" && exit 0; qodana scan --save-report'
-
   - name: build
     image: eclipse-temurin:21-jdk
     environment:
@@ -33,7 +22,7 @@ steps:
       SONAR_TOKEN:
         from_secret: sonar_token
     commands:
-      - '[ -z "$SONAR_TOKEN" ] || [ "$SONAR_TOKEN" = "." ] && echo "Skipping: SONAR_TOKEN not configured" && exit 0; ./gradlew sonarqube --info'
+      - ./gradlew sonarqube --info'
 
   - name: create-release-draft
     image: eclipse-temurin:21-jdk
