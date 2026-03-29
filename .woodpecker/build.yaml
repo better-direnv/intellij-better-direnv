@@ -22,7 +22,7 @@ steps:
       SONAR_TOKEN:
         from_secret: sonar_token
     commands:
-      - ./gradlew sonarqube --info'
+      - ./gradlew sonarqube --info
 
   - name: create-release-draft
     image: eclipse-temurin:21-jdk
