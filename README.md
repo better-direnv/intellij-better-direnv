@@ -3,6 +3,7 @@
 [![Build](https://github.com/better-direnv/intellij-better-direnv/actions/workflows/build.yml/badge.svg)](https://github.com/better-direnv/intellij-better-direnv/actions/workflows/build.yml)
 [![Version](https://img.shields.io/jetbrains/plugin/v/19275-better-direnv.svg)](https://plugins.jetbrains.com/plugin/19275-better-direnv)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/19275-better-direnv.svg)](https://plugins.jetbrains.com/plugin/19275-better-direnv)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=better-direnv_intellij-better-direnv&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=better-direnv_intellij-better-direnv)
 
 ## Description
 
