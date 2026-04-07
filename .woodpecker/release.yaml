@@ -1,0 +1,64 @@
+when:
+#  - event: tag # enable when github fails
+
+steps:
+  - name: build
+    image: eclipse-temurin:21-jdk
+    environment:
+      GRADLE_USER_HOME: /woodpecker/src/cache/gradle
+    commands:
+      - ./gradlew buildPlugin
+
+  - name: patch-changelog-and-publish
+    image: eclipse-temurin:21-jdk
+    environment:
+      GRADLE_USER_HOME: /woodpecker/src/cache/gradle
+      PUBLISH_TOKEN:
+        from_secret: jetbrains_token
+    commands:
+      - |
+        CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
+        ./gradlew patchChangelog --release-note="$CHANGELOG"
+      - ./gradlew publishPlugin
+
+  - name: create-github-release
+    image: eclipse-temurin:21-jdk
+    environment:
+      GRADLE_USER_HOME: /woodpecker/src/cache/gradle
+      GITHUB_TOKEN:
+        from_secret: github_token
+    commands:
+      - apt-get update -qq && apt-get install -y -qq gh
+      - |
+        CHANGELOG="$(./gradlew getChangelog --no-header --console=plain -q)"
+        TAG="${CI_COMMIT_TAG}"
+
+        gh release create "$TAG" \
+          --title "$TAG" \
+          --notes "$CHANGELOG" \
+          ./build/distributions/*.zip
+
+  - name: create-changelog-pr
+    image: eclipse-temurin:21-jdk
+    environment:
+      GITHUB_TOKEN:
+        from_secret: github_token
+    commands:
+      - apt-get update -qq && apt-get install -y -qq gh git
+      - |
+        TAG="${CI_COMMIT_TAG}"
+        BRANCH="changelog-update-${TAG}"
+
+        git config user.email "ci@woodpecker"
+        git config user.name "Woodpecker CI"
+
+        git checkout -b "$BRANCH"
+        git add CHANGELOG.md
+        git commit -m "Changelog update - ${TAG}"
+        git push origin "$BRANCH"
+
+        gh pr create \
+          --title "Changelog update - \`${TAG}\`" \
+          --body "Patched \`CHANGELOG.md\` for version \`${TAG}\`." \
+          --base main \
+          --head "$BRANCH"

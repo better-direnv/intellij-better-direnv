@@ -1,55 +1,19 @@
-# Woodpecker CI Pipeline for intellij-better-direnv
-# Steps:
-# - run 'build' and 'verifyPlugin' tasks
-# - run 'sonaraube' task (conditional)
-# - create a draft release
-
 when:
   - event: [push, pull_request]
+    branch: main
+  - event: pull_request
 
 steps:
-  - name: build
+  - name: test
     image: eclipse-temurin:21-jdk
     environment:
       GRADLE_USER_HOME: /woodpecker/src/cache/gradle
     commands:
-      - ./gradlew verifyPlugin build --info
+      - ./gradlew test --info
 
-  - name: sonarqube
+  - name: build-and-verify
     image: eclipse-temurin:21-jdk
     environment:
       GRADLE_USER_HOME: /woodpecker/src/cache/gradle
-      SONAR_TOKEN:
-        from_secret: sonar_token
     commands:
-      - ./gradlew sonarqube --info
-
-  - name: create-release-draft
-    image: eclipse-temurin:21-jdk
-    when:
-      - event: push
-        branch: main
-    environment:
-      GRADLE_USER_HOME: /woodpecker/src/cache/gradle
-      GITHUB_TOKEN:
-        from_secret: github_token
-    commands:
-      - '[ -z "$GITHUB_TOKEN" ] || [ "$GITHUB_TOKEN" = "." ] && echo "Skipping: GITHUB_TOKEN not configured" && exit 0'
-      - apt-get update -qq && apt-get install -y -qq gh
-      - |
-        PROPERTIES="$(./gradlew properties --console=plain -q)"
-        VERSION="$(echo "$PROPERTIES" | grep "^version:" | cut -f2- -d ' ')"
-        CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
-
-        gh api repos/{owner}/{repo}/releases \
-          --jq '.[] | select(.draft == true) | .id' \
-          | xargs -I '{}' gh api -X DELETE repos/{owner}/{repo}/releases/{}
-
-        gh release create "v${VERSION}" \
-          --draft \
-          --title "v${VERSION}" \
-          --notes "${CHANGELOG}"
-        
-        cd build/distributions
-        FILENAME=$(ls *.zip | head -1)
-        gh release upload "v${VERSION}" "${FILENAME}"
+      - ./gradlew buildPlugin verifyPlugin --info

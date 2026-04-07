@@ -41,6 +41,17 @@ by request.
   manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
+## Releasing
+
+1. Update `CHANGELOG.md` — add your changes under the `[Unreleased]` section.
+2. Bump the version in `gradle.properties`.
+3. Push to `main` and confirm the CI build passes.
+4. Push a version tag to trigger the release pipeline:
+   ```sh
+   git tag v1.2.3 && git push origin v1.2.3
+   ```
+   The pipeline will: publish the plugin to the JetBrains Marketplace, create a GitHub release with the changelog, and open a PR to commit the patched `CHANGELOG.md`.
+
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
 
