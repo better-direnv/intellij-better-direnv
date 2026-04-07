@@ -2,7 +2,7 @@
 <idea-plugin url="https://github.com/better-direnv/intellij-better-direnv">
     <id>com.fapiko.jetbrains.plugins.better_direnv</id>
     <name>Better Direnv</name>
-    <vendor>Lucas Jandrew</vendor>
+    <vendor url="https://plugins.jetbrains.com/vendor/better-direnv" email="betterdirenv@gmail.com">Better Direnv</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
