@@ -1,5 +1,6 @@
 when:
-#  - event: tag # enable when github fails
+#  - event: tag
+  - event: manual
 
 steps:
   - name: build
