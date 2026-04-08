@@ -3,6 +3,7 @@
 # intellij-better-direnv Changelog
 
 ## [Unreleased]
+ - Upgraded to latest intellij platform version, hopefully fixing most of the bugs in older versions
 
 ## [1.1.0]
  - Adds support for PHP run configurations (@shyim)

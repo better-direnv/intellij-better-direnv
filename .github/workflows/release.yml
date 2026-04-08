@@ -12,6 +12,9 @@ jobs:
   release:
     name: Publish Plugin
     runs-on: ubuntu-latest
+    environment:
+      name: 'IntelliJ Plugin'
+      deployment: false
     steps:
 
       # Check out current repository
