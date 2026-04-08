@@ -13,7 +13,7 @@ steps:
     image: eclipse-temurin:21-jdk
     environment:
       GRADLE_USER_HOME: /woodpecker/src/cache/gradle
-      PUBLISH_TOKEN:
+      ORG_GRADLE_PROJECT_intellijPlatformPublishingToken:
         from_secret: jetbrains_token
     commands:
       - |
