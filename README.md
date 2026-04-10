@@ -32,7 +32,7 @@ by request.
 - Using IDE built-in plugin system:
 
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "
-  intellij-better-direnv"</kbd> >
+  better_direnv"</kbd> >
   <kbd>Install Plugin</kbd>
 
 - Manually:
@@ -46,11 +46,11 @@ by request.
 1. Update `CHANGELOG.md` — add your changes under the `[Unreleased]` section.
 2. Bump the version in `gradle.properties`.
 3. Push to `main` and confirm the CI build passes.
-4. Push a version tag to trigger the release pipeline:
-   ```sh
-   git tag v1.2.3 && git push origin v1.2.3
-   ```
-   The pipeline will: publish the plugin to the JetBrains Marketplace, create a GitHub release with the changelog, and open a PR to commit the patched `CHANGELOG.md`.
+4. Create a GitHub release (as a pre-release or full release) targeting the desired tag via the GitHub UI or `gh` CLI.
+   The [Release workflow](.github/workflows/release.yml) will trigger automatically and:
+   - Patch `CHANGELOG.md` with the release body and open a PR to merge it back into `main`.
+   - Publish the plugin to the JetBrains Marketplace.
+   - Upload the built plugin as a release asset.
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
