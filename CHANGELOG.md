@@ -3,6 +3,8 @@
 # intellij-better-direnv Changelog
 
 ## [Unreleased]
+
+## [1.4.0] - 2026-04-10
 - Upgraded to latest intellij platform version, hopefully fixing most of the bugs in older versions
 - RubyMine Support (@deril)
 
