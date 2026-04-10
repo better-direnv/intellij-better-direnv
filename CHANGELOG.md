@@ -3,13 +3,13 @@
 # intellij-better-direnv Changelog
 
 ## [Unreleased]
- - Upgraded to latest intellij platform version, hopefully fixing most of the bugs in older versions
- - RubyMine Support (@deril)
+- Upgraded to latest intellij platform version, hopefully fixing most of the bugs in older versions
+- RubyMine Support (@deril)
 
 ## [1.1.0]
- - Adds support for PHP run configurations (@shyim)
- - Fixes ShIcon not being found in 2021.3 (@shyim)
- - Fixes Python support (@jfreela)
+- Adds support for PHP run configurations (@shyim)
+- Fixes ShIcon not being found in 2021.3 (@shyim)
+- Fixes Python support (@jfreela)
 
 ## [1.0.0]
 - Using an internal & experimental API to resolve an issue https://youtrack.jetbrains.com/issue/PY-56172/RunConfigurationpatchCommandLine-Not-Called-In-2022
