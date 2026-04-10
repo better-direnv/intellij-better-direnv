@@ -4,6 +4,7 @@
 
 ## [Unreleased]
  - Upgraded to latest intellij platform version, hopefully fixing most of the bugs in older versions
+ - RubyMine Support (@deril)
 
 ## [1.1.0]
  - Adds support for PHP run configurations (@shyim)

@@ -17,6 +17,8 @@ jobs:
       deployment: false
     permissions:
       contents: write
+      pull-requests: write
+
     steps:
 
       # Check out current repository
