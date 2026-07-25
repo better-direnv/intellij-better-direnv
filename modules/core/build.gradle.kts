@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
     intellijPlatform {
         create(properties("platformType"), properties("platformVersion"))
     }
