@@ -11,7 +11,7 @@ plugins {
     id("org.jetbrains.intellij.platform")
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.5.0"
-    id("org.sonarqube") version "5.1.0.4882"
+    id("org.sonarqube") version "7.3.1.8318"
 }
 
 group = properties("pluginGroup")
