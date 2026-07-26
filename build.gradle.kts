@@ -10,7 +10,7 @@ plugins {
     // Gradle IntelliJ Plugin
     id("org.jetbrains.intellij.platform")
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "2.4.0"
+    id("org.jetbrains.changelog") version "2.5.0"
     id("org.sonarqube") version "7.3.1.8318"
 }
 
