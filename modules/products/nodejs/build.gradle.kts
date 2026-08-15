@@ -17,4 +17,8 @@ dependencies {
         create("IU", properties("platformVersion"))
         bundledPlugins(listOf("JavaScript", "NodeJS"))
     }
+
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
+    testImplementation("org.mockito:mockito-core:5.18.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
