@@ -3,6 +3,7 @@
 # intellij-better-direnv Changelog
 
 ## [Unreleased]
+- Fixes NPM run configurations crashing on IntelliJ 2026.2 by widening plugin compatibility so Marketplace serves the already-fixed build instead of an old incompatible release (#64)
 
 ## [1.4.0] - 2026-04-10
 - Upgraded to latest intellij platform version, hopefully fixing most of the bugs in older versions
