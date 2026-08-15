@@ -1,6 +1,7 @@
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 
 fun properties(key: String) = project.findProperty(key).toString()
 
@@ -72,11 +73,23 @@ intellijPlatform {
         // Configure sinceBuild and untilBuild - explicitly set to maintain compatibility range
         ideaVersion {
             sinceBuild = properties("pluginSinceBuild")
-            untilBuild = properties("pluginUntilBuild")
+            // Leave untilBuild unset (rather than assigning an empty string) when
+            // pluginUntilBuild is blank, so the <until-build> element is omitted entirely
+            // for open-ended compatibility - an empty element is rejected by the verifier.
+            val untilBuildProperty = properties("pluginUntilBuild")
+            if (untilBuildProperty.isNotBlank()) {
+                untilBuild = untilBuildProperty
+            }
         }
     }
 
     pluginVerification {
+        // Internal/experimental API usages are pre-existing (tracked in #69) and shouldn't
+        // block releases; everything else still fails the build.
+        failureLevel = VerifyPluginTask.FailureLevel.ALL -
+            VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES -
+            VerifyPluginTask.FailureLevel.EXPERIMENTAL_API_USAGES
+
         ides {
 
             // Some products are disabled, a full test exceeds the disk space of the github runner
