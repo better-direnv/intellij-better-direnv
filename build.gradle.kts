@@ -188,7 +188,7 @@ tasks {
 
     // Configure UI tests plugin
     // Read more: https://github.com/JetBrains/intellij-ui-test-robot
-    val runIdeForUiTests by intellijPlatformTesting.runIde.registering {
+    intellijPlatformTesting.runIde.register("runIdeForUiTests") {
         task {
             jvmArgumentProviders += CommandLineArgumentProvider {
                 listOf(

@@ -1,5 +1,5 @@
 pluginManagement {
-    val intellijPlatformVersion: String by settings
+    val intellijPlatformVersion = providers.gradleProperty("intellijPlatformVersion").get()
     plugins {
         id("org.jetbrains.intellij.platform") version intellijPlatformVersion
     }
