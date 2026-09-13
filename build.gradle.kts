@@ -39,6 +39,20 @@ allprojects {
     tasks.withType<Test> {
         useJUnitPlatform()
     }
+
+    // InstrumentCodeTask drives `project.ant`, and Gradle's AntBuilder is stateful and
+    // not thread-safe. With the configuration cache enabled, Gradle runs tasks of the
+    // *same* project in parallel (`--no-parallel` does not disable this), so a project's
+    // instrumentCode and instrumentTestCode can drive that one AntBuilder concurrently
+    // and corrupt Ant's shared element-wrapper stack. That surfaces as a flaky
+    // `ArrayIndexOutOfBoundsException: 1 >= 1` from AntXMLContext.popWrapper, reported by
+    // Gradle only as "Execution failed for task ':instrumentCode' > 1 >= 1".
+    // Ordering the two removes the race without giving up parallelism anywhere else.
+    // Upstream: JetBrains/intellij-platform-gradle-plugin#2193, fixed in the plugin's
+    // unreleased [next] (> 2.18.1). Remove this once intellijPlatformVersion includes it.
+    tasks.matching { it.name == "instrumentTestCode" }.configureEach {
+        mustRunAfter("instrumentCode")
+    }
 }
 
 subprojects {
