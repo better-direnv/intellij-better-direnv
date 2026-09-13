@@ -1,3 +1,10 @@
+pluginManagement {
+    val intellijPlatformVersion = providers.gradleProperty("intellijPlatformVersion").get()
+    plugins {
+        id("org.jetbrains.intellij.platform") version intellijPlatformVersion
+    }
+}
+
 rootProject.name = "better_direnv"
 
 include(

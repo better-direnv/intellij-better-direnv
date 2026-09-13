@@ -14,14 +14,14 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+@SuppressWarnings("UnstableApiUsage") // for target environments (Docker, SSH, WSL) this is the only extension mechanism
 public class PycharmEnvironmentProvider implements PythonCommandLineTargetEnvironmentProvider {
 
     @Override
     public void extendTargetEnvironment(@NotNull Project project, @NotNull HelpersAwareTargetEnvironmentRequest helpersAwareTargetEnvironmentRequest, @NotNull PythonExecution pythonExecution, @NotNull PythonRunParams pythonRunParams) {
-        if (!(pythonRunParams instanceof AbstractPythonRunConfiguration)) {
+        if (!(pythonRunParams instanceof AbstractPythonRunConfiguration<?> runConfig)) {
             return;
         }
-        AbstractPythonRunConfiguration<?> runConfig = (AbstractPythonRunConfiguration<?>) pythonRunParams;
         DirenvSettings direnvSettings = runConfig.getCopyableUserData(RunConfigSettingsEditor.USER_DATA_KEY);
         Map<String, String> direnvVariables = RunConfigSettingsEditor.collectEnv(direnvSettings, pythonRunParams.getWorkingDirectory());
         Map<String, String> runConfigurationVariables = pythonRunParams.getEnvs();

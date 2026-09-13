@@ -1,4 +1,7 @@
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 
 fun properties(key: String) = project.findProperty(key).toString()
 
@@ -6,14 +9,22 @@ plugins {
     // Java support
     id("java")
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.11.0"
+    id("org.jetbrains.intellij.platform")
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "1.3.1"
-    id("org.sonarqube") version "3.3"
+    id("org.jetbrains.changelog") version "2.5.0"
+    id("org.sonarqube") version "7.5.0.8588"
 }
 
 group = properties("pluginGroup")
 version = properties("pluginVersion")
+
+// Root project repositories
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
+}
 
 allprojects {
     version = version
@@ -23,6 +34,32 @@ allprojects {
 
     repositories {
         mavenCentral()
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+    // InstrumentCodeTask drives `project.ant`, and Gradle's AntBuilder is stateful and
+    // not thread-safe. With the configuration cache enabled, Gradle runs tasks of the
+    // *same* project in parallel (`--no-parallel` does not disable this), so a project's
+    // instrumentCode and instrumentTestCode can drive that one AntBuilder concurrently
+    // and corrupt Ant's shared element-wrapper stack. That surfaces as a flaky
+    // `ArrayIndexOutOfBoundsException: 1 >= 1` from AntXMLContext.popWrapper, reported by
+    // Gradle only as "Execution failed for task ':instrumentCode' > 1 >= 1".
+    // Ordering the two removes the race without giving up parallelism anywhere else.
+    // Upstream: JetBrains/intellij-platform-gradle-plugin#2193, fixed in the plugin's
+    // unreleased [next] (> 2.18.1). Remove this once intellijPlatformVersion includes it.
+    tasks.matching { it.name == "instrumentTestCode" }.configureEach {
+        mustRunAfter("instrumentCode")
+    }
+}
+
+subprojects {
+    pluginManager.withPlugin("org.jetbrains.intellij.platform") {
+        extensions.configure<org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension> {
+            buildSearchableOptions = false
+        }
     }
 }
 
@@ -36,18 +73,63 @@ dependencies {
     implementation(project(":better_direnv-products-python"))
     implementation(project(":better_direnv-products-phpstorm"))
     implementation(project(":better_direnv-products-rubymine"))
+    intellijPlatform {
+        create(properties("platformType"), properties("platformVersion"))
+    }
 }
 
 // Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-intellij {
-    pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
-    type.set("CL")
+intellijPlatform {
+    buildSearchableOptions = false
 
-    updateSinceUntilBuild.set(false)
+    pluginConfiguration {
+        name = properties("pluginName")
 
-    // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set("".split(',').map(String::trim).filter(String::isNotEmpty))
+        // Configure sinceBuild and untilBuild - explicitly set to maintain compatibility range
+        ideaVersion {
+            sinceBuild = properties("pluginSinceBuild")
+            // Leave untilBuild unset (rather than assigning an empty string) when
+            // pluginUntilBuild is blank, so the <until-build> element is omitted entirely
+            // for open-ended compatibility - an empty element is rejected by the verifier.
+            val untilBuildProperty = properties("pluginUntilBuild")
+            if (untilBuildProperty.isNotBlank()) {
+                untilBuild = untilBuildProperty
+            }
+        }
+    }
+
+    pluginVerification {
+        // Internal/experimental API usages are pre-existing (tracked in #69) and shouldn't
+        // block releases; everything else still fails the build.
+        failureLevel = VerifyPluginTask.FailureLevel.ALL -
+            VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES -
+            VerifyPluginTask.FailureLevel.EXPERIMENTAL_API_USAGES
+
+        ides {
+
+            // Some products are disabled, a full test exceeds the disk space of the github runner
+            select {
+                types = listOf(
+//                    IntelliJPlatformType.IntellijIdeaCommunity,
+                    IntelliJPlatformType.IntellijIdeaUltimate,
+//                    IntelliJPlatformType.PyCharmCommunity,
+//                    IntelliJPlatformType.PhpStorm,
+//                    IntelliJPlatformType.RubyMine,
+//                    IntelliJPlatformType.GoLand,
+//                    IntelliJPlatformType.WebStorm
+                )
+
+                channels = listOf(ProductRelease.Channel.RELEASE)
+                sinceBuild = properties("pluginSinceBuild")
+                untilBuild = properties("pluginUntilBuild")
+            }
+        }
+    }
+
+    publishing {
+        token = providers.gradleProperty("intellijPlatformPublishingToken")
+        //channels = listOf("beta")
+    }
 }
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
@@ -66,7 +148,7 @@ sonarqube {
 
 gradle.taskGraph.whenReady(closureOf<TaskExecutionGraph> {
     val ignoreSubprojectTasks = listOf(
-        "buildSearchableOptions", "listProductsReleases", "patchPluginXml", "publishPlugin", "runIde", "runPluginVerifier",
+        "buildSearchableOptions", "prepareJarSearchableOptions", "listProductsReleases", "patchPluginXml", "publishPlugin", "runIde", "runPluginVerifier",
         "verifyPlugin"
     )
 
@@ -94,9 +176,8 @@ tasks {
     }
 
     patchPluginXml {
-        version.set(properties("pluginVersion"))
-        sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set(properties("pluginUntilBuild"))
+        version = properties("pluginVersion")
+        // Note: sinceBuild and untilBuild are now configured in pluginConfiguration.ideaVersion block
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription.set(
@@ -112,31 +193,46 @@ tasks {
         )
 
         // Get the latest available change notes from the changelog file
-        changeNotes.set(provider {
-            changelog.run {
-                getOrNull(properties("pluginVersion")) ?: getLatest()
-            }.toHTML()
-        })
+        changeNotes.set(
+            changelog.renderItem(
+                changelog.getOrNull(properties("pluginVersion")) ?: changelog.getLatest(),
+                org.jetbrains.changelog.Changelog.OutputType.HTML
+            )
+        )
     }
 
     // Configure UI tests plugin
     // Read more: https://github.com/JetBrains/intellij-ui-test-robot
-    runIdeForUiTests {
-        systemProperty("robot-server.port", "8082")
-        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
-        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
-        systemProperty("jb.consents.confirmation.enabled", "false")
+    intellijPlatformTesting.runIde.register("runIdeForUiTests") {
+        task {
+            jvmArgumentProviders += CommandLineArgumentProvider {
+                listOf(
+                    "-Drobot-server.port=8082",
+                    "-Dide.mac.message.dialogs.as.sheets=false",
+                    "-Djb.privacy.policy.text=<!--999.999-->",
+                    "-Djb.consents.confirmation.enabled=false",
+                )
+            }
+        }
+
+        plugins {
+            robotServerPlugin()
+        }
     }
 
     signPlugin {
-        certificateChain.set(File("chain.crt").readText(Charsets.UTF_8))
-        privateKey.set(File("private.pem").readText(Charsets.UTF_8))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+        val chainFile = File("chain.crt")
+        val keyFile = File("private.pem")
+        if (chainFile.exists() && keyFile.exists()) {
+            certificateChain.set(chainFile.readText(Charsets.UTF_8))
+            privateKey.set(keyFile.readText(Charsets.UTF_8))
+            password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+        }
     }
 
     publishPlugin {
         dependsOn("patchChangelog")
-        token.set(System.getenv("PUBLISH_TOKEN"))
+        token = System.getenv("PUBLISH_TOKEN")
         // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel

@@ -1,0 +1,19 @@
+when:
+  - event: [push, pull_request]
+    branch: main
+  - event: pull_request
+
+steps:
+  - name: test
+    image: eclipse-temurin:21-jdk
+    environment:
+      GRADLE_USER_HOME: /woodpecker/src/cache/gradle
+    commands:
+      - ./gradlew test --info
+
+  - name: build-and-verify
+    image: eclipse-temurin:21-jdk
+    environment:
+      GRADLE_USER_HOME: /woodpecker/src/cache/gradle
+    commands:
+      - ./gradlew buildPlugin verifyPlugin --info

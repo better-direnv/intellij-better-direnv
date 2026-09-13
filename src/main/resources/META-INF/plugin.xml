@@ -1,8 +1,9 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin url="https://github.com/Fapiko/intellij-better-direnv">
+<idea-plugin url="https://github.com/better-direnv/intellij-better-direnv">
     <id>com.fapiko.jetbrains.plugins.better_direnv</id>
     <name>Better Direnv</name>
-    <vendor>Lucas Jandrew</vendor>
+    <vendor url="https://plugins.jetbrains.com/vendor/better-direnv" email="betterdirenv@gmail.com">Better Direnv</vendor>
+    <description>Dynamically adding environment variables to various run configuration from .envrc (and .env).</description>
 
     <depends>com.intellij.modules.platform</depends>
 

@@ -1,6 +1,8 @@
 .gradle
-.idea
+.idea/
+.intellijPlatform/
 .qodana
 build
 chain.crt
 private.pem
+.sdkmanrc

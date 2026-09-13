@@ -9,6 +9,7 @@ import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.RunConfigurationBase;
 import com.intellij.execution.configurations.RunnerSettings;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.util.NlsContexts;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,11 @@ public class IdeaRunConfigurationExtension extends RunConfigurationExtension {
 
             params.setEnv(envVars);
         }
+    }
+
+    @Override
+    protected @Nullable @NlsContexts.TabTitle String getEditorTitle() {
+        return "Direnv";
     }
 
     @Override

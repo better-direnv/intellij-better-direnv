@@ -1,16 +1,23 @@
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
-    id("org.jetbrains.intellij")
-    // Gradle Lombok plugin
-    id("io.freefair.lombok") version "6.4.3"
+    id("org.jetbrains.kotlin.jvm") version "2.4.20"
+    id("org.jetbrains.intellij.platform")
+    // Gradle Lombok plugin - updated to 8.11 for Java 21 compatibility
+    id("io.freefair.lombok") version "9.5.0"
+}
+
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-}
-
-// Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-intellij {
-    version.set(properties("platformVersion"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
+    intellijPlatform {
+        create(properties("platformType"), properties("platformVersion"))
+    }
 }

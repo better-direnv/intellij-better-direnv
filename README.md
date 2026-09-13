@@ -1,8 +1,11 @@
 # intellij-better-direnv
 
-![Build](https://github.com/Fapiko/intellij-better-direnv/workflows/Build/badge.svg)
+[![Build](https://github.com/better-direnv/intellij-better-direnv/actions/workflows/build.yml/badge.svg)](https://github.com/better-direnv/intellij-better-direnv/actions/workflows/build.yml)
 [![Version](https://img.shields.io/jetbrains/plugin/v/19275-better-direnv.svg)](https://plugins.jetbrains.com/plugin/19275-better-direnv)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/19275-better-direnv.svg)](https://plugins.jetbrains.com/plugin/19275-better-direnv)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=better-direnv_intellij-better-direnv&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=better-direnv_intellij-better-direnv)
+
+## Description
 
 <!-- Plugin description -->
 This plugin adds direnv support to IntelliJ IDEs.
@@ -29,7 +32,7 @@ by request.
 - Using IDE built-in plugin system:
 
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "
-  intellij-better-direnv"</kbd> >
+  better_direnv"</kbd> >
   <kbd>Install Plugin</kbd>
 
 - Manually:
@@ -37,6 +40,17 @@ by request.
   Download the [latest release](https://github.com/Fapiko/intellij-better-direnv/releases/latest) and install it
   manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+
+## Releasing
+
+1. Update `CHANGELOG.md` — add your changes under the `[Unreleased]` section.
+2. Bump the version in `gradle.properties`.
+3. Push to `main` and confirm the CI build passes.
+4. Create a GitHub release (as a pre-release or full release) targeting the desired tag via the GitHub UI or `gh` CLI.
+   The [Release workflow](.github/workflows/release.yml) will trigger automatically and:
+   - Patch `CHANGELOG.md` with the release body and open a PR to merge it back into `main`.
+   - Publish the plugin to the JetBrains Marketplace.
+   - Upload the built plugin as a release asset.
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
