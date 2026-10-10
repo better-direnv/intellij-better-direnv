@@ -5,7 +5,7 @@ Guidance for future Claude Code sessions working in this repo.
 ## Project shape
 
 Multi-module Gradle project using the IntelliJ Platform Gradle Plugin
-(`org.jetbrains.intellij.platform`, currently 2.18.1). Each IDE-specific
+(`org.jetbrains.intellij.platform`, currently 2.19.0). Each IDE-specific
 extension lives under `modules/products/<name>` (nodejs, python, phpstorm,
 goland, rubymine, idea, shellscript), with shared code in `modules/core`.
 
@@ -48,7 +48,7 @@ these rewritten names when targeting a module, e.g.:
 
 ## `pluginVerification.failureLevel`
 
-Default `failureLevel` under the 2.18.1 Gradle plugin includes
+Default `failureLevel` under the 2.19.0 Gradle plugin includes
 `INTERNAL_API_USAGES` and `EXPERIMENTAL_API_USAGES`, which will fail
 `verifyPlugin` for pre-existing internal-API use in
 `modules/products/python/.../PycharmEnvironmentProvider.java` (implements the
