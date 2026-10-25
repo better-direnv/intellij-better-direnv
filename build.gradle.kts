@@ -51,6 +51,7 @@ subprojects {
 
 
 dependencies {
+    implementation(project(":better_direnv-products-clion"))
     implementation(project(":better_direnv-products-goland"))
     implementation(project(":better_direnv-products-idea"))
     implementation(project(":better_direnv-products-nodejs"))
