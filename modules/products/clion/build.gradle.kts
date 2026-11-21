@@ -15,6 +15,6 @@ dependencies {
     implementation(project(":better_direnv-core"))
     intellijPlatform {
         create("CL", properties("platformVersion"))
-        bundledPlugins(listOf("com.intellij.clion", "com.intellij.cidr.lang"))
+        bundledPlugins(listOf("com.intellij.clion", "com.intellij.nativeDebug"))
     }
 }
