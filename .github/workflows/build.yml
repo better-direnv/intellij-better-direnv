@@ -42,12 +42,12 @@ jobs:
       - name: Gradle Wrapper Validation
         uses: gradle/actions/wrapper-validation@v6
 
-      # Setup Java 11 environment for the next steps
+      # Setup Java 25 environment for the next steps
       - name: Setup Java
         uses: actions/setup-java@v6
         with:
           distribution: zulu
-          java-version: 21
+          java-version: 25
 #          cache: gradle
 
       - name: Cache SonarCloud packages
