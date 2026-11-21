@@ -93,6 +93,35 @@ To add tests to a product module that doesn't have a `src/test` yet:
   an `AbstractNodeTargetRunProfile` that is neither known subtype must not
   cause a `ClassCastException`).
 
+## CI runner disk space
+
+Every product module declares its own IDE as a compile dependency (`create("GO", …)`,
+`pycharm(…)`, `create("CL", …)`, …), and each one lands in `~/.gradle/caches` as a
+tarball plus an extracted copy. They all accumulate within the single `build` job on
+`ubuntu-latest`, so adding a product module can push the runner over its disk limit.
+The symptom is `No space left on device` while downloading an IDE (typically during
+`verifyPlugin`), not a code error — the CLion PR hit this (runner log: "Free space
+left: 1 MB").
+
+Current mitigation: a "Free Disk Space" step at the start of the `build` job in
+`.github/workflows/build.yml` removes preinstalled toolchains (.NET, Android SDK,
+GHC, CodeQL) and prints `df -h /`. After that step the CLion branch runs at ~28%
+disk use, so there is room for now. If it gets tight again, in order of preference:
+
+1. **Split `verifyPlugin` into its own job** (fresh runner disk). The build/test job
+   uploads the plugin artifact (or just rebuilds), the verify job runs
+   `./gradlew verifyPlugin`. Costs some CI time but is robust and needs no cache
+   surgery. This is the preferred fallback.
+2. Delete downloaded IDE tarballs from the Gradle cache after extraction. Roughly
+   halves usage but is untested — Gradle may re-download if it needs them again.
+3. Delete a module's extracted IDE between per-module builds. Not recommended:
+   up-to-date checks on `buildPlugin` re-resolve every module's IDE classpath, so
+   Gradle re-downloads what was removed, and it depends on the plugin's cache layout.
+
+Note that `verifyPlugin` itself only checks against IDEA Ultimate (see the
+`pluginVerification { ides { select { … } } }` block in `build.gradle.kts`); the
+disk pressure comes from the per-module compile-time IDEs, not the verifier IDEs.
+
 ## Debugging crashes reported against a released version
 
 Before assuming a stack trace maps to current `main`, check whether it could
