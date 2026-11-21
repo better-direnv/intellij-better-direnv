@@ -45,12 +45,14 @@ by request.
 
 1. Update `CHANGELOG.md` — add your changes under the `[Unreleased]` section.
 2. Bump the version in `gradle.properties`.
-3. Push to `main` and confirm the CI build passes.
-4. Create a GitHub release (as a pre-release or full release) targeting the desired tag via the GitHub UI or `gh` CLI.
-   The [Release workflow](.github/workflows/release.yml) will trigger automatically and:
-   - Patch `CHANGELOG.md` with the release body and open a PR to merge it back into `main`.
-   - Publish the plugin to the JetBrains Marketplace.
-   - Upload the built plugin as a release asset.
+3. Push to `main`. Once the [Build workflow](.github/workflows/build.yml) passes, it creates a **draft** GitHub
+   release `v<version>` with the `[Unreleased]` changelog entries as release notes (replacing any older drafts).
+4. Review the draft on the GitHub Releases page and publish it (as a pre-release or full release).
+   Publishing the release creates the `v<version>` tag on the released commit and triggers the
+   [Release workflow](.github/workflows/release.yml), which:
+   - Publishes the plugin to the JetBrains Marketplace.
+   - Uploads the built plugin as a release asset.
+   - Patches `CHANGELOG.md` with the release notes and opens a PR to merge it back into `main`.
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].

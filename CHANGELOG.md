@@ -4,9 +4,9 @@
 
 ## Unreleased
 
-- Upgraded IntelliJ Platform Gradle Plugin to 2.19.0, fixing flaky parallel code-instrumentation build failures (#72)
-- Enabled the Gradle configuration cache and replaced Kotlin DSL syntax deprecated for removal in Gradle 10
-- Dependency updates (Gradle 9.9.1, Kotlin 2.4.21, Lombok plugin 9.8.3, Mockito 5.24.0, SonarQube plugin 7.6, actions/setup-java 6)
+## 1.4.3 - 2026-11-21
+
+- Upgraded IntelliJ Platform Gradle Plugin to 2.19.0, fixing flaky parallel code-instrumentation build failures (#72)%0A- Enabled the Gradle configuration cache and replaced Kotlin DSL syntax deprecated for removal in Gradle 10%0A- Dependency updates (Gradle 9.9.1, Kotlin 2.4.21, Lombok plugin 9.8.3, Mockito 5.24.0, SonarQube plugin 7.6, actions/setup-java 6)
 
 ## 1.4.2 - 2026-08-15
 
