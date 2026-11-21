@@ -9,6 +9,7 @@ rootProject.name = "better_direnv"
 
 include(
     "modules/core",
+    "modules/products/clion",
     "modules/products/goland",
     "modules/products/idea",
     "modules/products/nodejs",

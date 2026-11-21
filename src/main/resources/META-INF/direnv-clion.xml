@@ -1,0 +1,7 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="cidr">
+        <runConfigurationExtension
+                implementation="com.fapiko.jetbrains.plugins.better_direnv.runconfigs.CLionRunConfigurationExtension"
+                id="direnvCLion"/>
+    </extensions>
+</idea-plugin>
